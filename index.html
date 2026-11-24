@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenCarbon Plants</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+
+/* ═══ SHARED DESIGN SYSTEM ════════════════════════════════════ */
+:root {
+  --green-50:  #f0f7ec;
+  --green-100: #d4ebb8;
+  --green-200: #a8d475;
+  --green-400: #639922;
+  --green-600: #3b6d11;
+  --green-800: #1e3d07;
+  --bark-200:  #c4a97c;
+  --bark-400:  #8b6f47;
+  --bark-600:  #5c4728;
+  --soil-50:   #fafaf7;
+  --soil-100:  #f2f0e9;
+  --soil-200:  #e8e4d8;
+  --soil-400:  #b8b49f;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-card: 0 2px 12px rgba(30,61,7,0.07), 0 1px 3px rgba(30,61,7,0.05);
+  --shadow-hover: 0 8px 28px rgba(30,61,7,0.14), 0 2px 6px rgba(30,61,7,0.07);
+  --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--soil-100); color: var(--green-800); min-height: 100vh; }
+a { text-decoration: none; color: inherit; }
+img { display: block; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+/* ─── NAVBAR ─────────────────────────────────────────────── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--green-800);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 64px;
+  box-shadow: 0 2px 16px rgba(17,33,4,0.25);
+}
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--green-100);
+  text-decoration: none;
+  transition: var(--transition);
+}
+.logo:hover { color: #fff; }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.nav-links a {
+  font-size: 0.875rem;
+  color: var(--green-200);
+  letter-spacing: 0.04em;
+  transition: var(--transition);
+  position: relative;
+  padding-bottom: 3px;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 50%;
+  width: 0; height: 2px;
+  background: var(--green-200);
+  border-radius: 2px;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1), left 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.nav-links a:hover { color: #fff; transform: translateY(-1px); }
+.nav-links a:hover::after { width: 100%; left: 0; background: #fff; }
+.nav-links a.active { color: #fff; font-weight: 500; }
+.nav-links a.active::after { width: 100%; left: 0; background: var(--green-200); }
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 28px;
+  height: 28px;
+}
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--green-200);
+  border-radius: 2px;
+  transition: var(--transition);
+}
+.nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.nav-cart-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.nav-cart-icon svg { width: 22px; height: 22px; stroke: var(--green-200); }
+
+/* ─── NAV SEARCH ─────────────────────────────────────────── */
+.nav-search { position: relative; display: flex; align-items: center; }
+.nav-search-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--green-200);
+  transition: var(--transition);
+}
+.nav-search-toggle svg { width: 20px; height: 20px; }
+.nav-search-toggle:hover,
+.nav-search.open .nav-search-toggle { color: #fff; }
+.nav-search-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 10px 30px rgba(17,33,4,0.30);
+  padding: 4px;
+  width: 0;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: width 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease;
+}
+.nav-search.open .nav-search-panel {
+  width: min(340px, 80vw);
+  opacity: 1;
+  pointer-events: auto;
+}
+.nav-search-panel input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--green-800);
+  padding: 0.55rem 0.5rem 0.55rem 0.95rem;
+}
+.nav-search-panel input::placeholder { color: var(--soil-400); }
+.nav-search-go {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--green-600);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+.nav-search-go svg { width: 15px; height: 15px; }
+.nav-search-go:hover { background: var(--green-800); }
+
+.cart-badge {
+  position: absolute;
+  top: -7px;
+  right: -8px;
+  background: var(--green-200);
+  color: var(--green-800);
+  font-size: 0.65rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero {
+  position: relative;
+  min-height: calc(100vh - 64px);
+  background: url('images/hero.jpg') center center / cover no-repeat;
+  display: flex;
+  align-items: center;
+}
+/* dark green gradient overlay — same green-800 as navbar */
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    rgba(17, 33, 4, 0.82) 30%,
+    rgba(30, 61, 7, 0.65) 50%,
+    rgba(30, 61, 7, 0.25) 60%
+  );
+}
+
+
+
+.hero-text {
+  position: relative;
+  z-index: 1;
+  max-width: 580px;
+  padding: 0 2.5rem;
+}
+.hero-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+/* second h1 — kept as per original structure */
+.hero-text h1 + h1 { margin-top: -0.4rem; color: var(--green-200); }
+.hero-text p {
+  font-size: 1rem;
+  color: var(--green-100);
+  line-height: 1.75;
+  opacity: 0.88;
+  max-width: 440px;
+  margin-bottom: 2.25rem;
+}
+.hero-btn {
+  display: inline-block;
+  background: var(--green-600);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 0.85rem 2.25rem;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+.hero-btn:hover {
+  background: var(--green-400);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59,109,17,0.45);
+}
+
+/* ── CATEGORIES ───────────────────────────────────────────── */
+.categories {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 4rem 2.5rem 5rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+.category-item {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+.category-item:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+}
+.image-box {
+  overflow: hidden;
+  aspect-ratio: 3/2;
+  background: var(--green-50);
+}
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+.category-item:hover .image-box img { transform: scale(1.07); }
+.category-item h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--green-800);
+  margin: 1.1rem 1.25rem 0.3rem;
+  transition: var(--transition);
+}
+.category-item:hover h3 { color: var(--green-600); }
+.category-item h3 a { color: inherit; }
+.category-item p {
+  font-size: 0.8rem;
+  color: var(--bark-400);
+  line-height: 1.55;
+  margin: 0 1.25rem 1.25rem;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+.site-footer {
+  background: var(--green-800);
+  color: var(--green-200);
+  padding: 2.5rem 2.5rem 1.5rem;
+}
+.footer-columns {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+@media (max-width: 700px) {
+  .footer-columns { grid-template-columns: repeat(2, 1fr); }
+}
+.footer-column h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--green-100);
+  margin-bottom: 0.75rem;
+}
+.footer-column ul { list-style: none; }
+.footer-column ul li { margin-bottom: 0.4rem; }
+.footer-column a { font-size: 0.82rem; color: var(--green-200); transition: var(--transition); }
+.footer-column a:hover { color: #fff; }
+.footer-column p { font-size: 0.82rem; color: var(--green-200); margin-bottom: 0.3rem; }
+.footer-social {
+  display: flex;
+  gap: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: 1.25rem;
+  margin-bottom: 1rem;
+}
+.footer-social a {
+  font-size: 0.8rem;
+  color: var(--green-200);
+  transition: var(--transition);
+  position: relative;
+  padding-bottom: 2px;
+}
+.footer-social a::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0; height: 1px;
+  background: #fff;
+  transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.footer-social a:hover { color: #fff; }
+.footer-social a:hover::after { width: 100%; }
+.footer-copy { font-size: 0.75rem; color: var(--bark-200); }
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .navbar { padding: 0 1.25rem; }
+  .navbar-menu { gap: 1rem; }
+  .nav-toggle { display: flex; }
+  .nav-links {
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--green-800);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 8px 16px rgba(17,33,4,0.25);
+  }
+  .nav-links.open { max-height: 260px; }
+  .nav-links a {
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-search { position: static; }
+  .nav-search-panel { position: fixed; top: 72px; left: 16px; right: 16px; }
+  .nav-search.open .nav-search-panel { width: auto; }
+  .hero-text { padding: 0 1.25rem; }
+  .hero-text h1 { font-size: 2.4rem; }
+  .categories { padding: 2.5rem 1.25rem 3rem; gap: 1rem; }
+}
+@media (max-width: 420px) {
+  .categories { grid-template-columns: 1fr; }
+}
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <a href="index.html" class="logo">GREENCARBON PLANTS</a>
+  <div class="navbar-menu">
+    <nav class="nav-links" id="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="shop.html">Shop</a>
+      <a href="cart.html">Cart</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav-search" id="nav-search">
+      <button type="button" class="nav-search-toggle" id="nav-search-toggle" aria-label="Search products" aria-expanded="false" aria-controls="nav-search-panel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/>
+        </svg>
+      </button>
+      <form class="nav-search-panel" id="nav-search-panel" action="shop.html" method="get" role="search">
+        <input type="search" name="q" id="nav-search-input" placeholder="Search plants, flowers, trees…" aria-label="Search products" autocomplete="off">
+        <button type="submit" class="nav-search-go" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+    <a href="cart.html" class="nav-cart-icon" aria-label="Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span class="cart-badge" id="nav-cart-count">0</span>
+    </a>
+    <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="nav-links">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- HERO / LANDING -->
+<section class="hero">
+  <div class="hero-overlay"></div>
+  <div class="hero-text">
+    <h1>Grow Green</h1>
+    <h1>Live Clean</h1>
+    <p>
+      Quality plants, flowers, fruits, and trees for a greener,
+      healthier environment, aiming to reduce Global Carbon footprint.
+    </p>
+    <a href="shop.html" class="hero-btn">Explore</a>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories">
+
+
+
+  <div class="category-item">
+    <a href="shop.html#flowers" class="image-box">
+      <img src="images/flowers.jpg" alt="Flowers">
+    </a>
+    <h3><a href="shop.html#flowers">Flowers</a></h3>
+    <p>Fresh, colorful blooms for every occasion.</p>
+  </div>
+
+  <div class="category-item">
+    <a href="shop.html#plants" class="image-box">
+      <img src="images/plants.jpg" alt="Plants">
+    </a>
+    <h3><a href="shop.html#plants">Plants</a></h3>
+    <p>Indoor and outdoor plants that purify your space.</p>
+  </div>
+
+  <div class="category-item">
+    <a href="shop.html#fruits" class="image-box">
+      <img src="images/fruits.jpg" alt="Fruits">
+    </a>
+    <h3><a href="shop.html#fruits">Fruits</a></h3>
+    <p>Fruit-bearing plants for sustainable living.</p>
+  </div>
+
+  <div class="category-item">
+    <a href="shop.html#trees" class="image-box">
+      <img src="images/trees.jpg" alt="Trees">
+    </a>
+    <h3><a href="shop.html#trees">Trees</a></h3>
+    <p>Shade and decorative trees for greener spaces.</p>
+  </div>
+
+  <div class="category-item">
+    <a href="shop.html#herbs" class="image-box">
+      <img src="images/herbs.png" alt="Herbs">
+    </a>
+    <h3><a href="shop.html#herbs">Herbs</a></h3>
+    <p>Fresh culinary herbs to season every kitchen.</p>
+  </div>
+
+  <div class="category-item">
+    <a href="shop.html#spices" class="image-box">
+      <img src="images/spices.png" alt="Spices">
+    </a>
+    <h3><a href="shop.html#spices">Spices</a></h3>
+    <p>Aromatic spices grown for bold, natural flavour.</p>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-columns">
+    <div class="footer-column">
+      <h4>Products</h4>
+      <ul>
+        <li><a href="shop.html#plants">Plants</a></li>
+        <li><a href="shop.html#flowers">Flowers</a></li>
+        <li><a href="shop.html#fruits">Fruits</a></li>
+        <li><a href="shop.html#trees">Trees</a></li>
+        <li><a href="shop.html#herbs">Herbs</a></li>
+        <li><a href="shop.html#spices">Spices</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="cart.html">Cart</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>Brands</h4>
+      <ul>
+        <li>111 Display</li>
+        <li>Fashion Picha</li>
+        <li>Turaco Camp</li>
+        <li>Earlybad Records</li>
+      </ul>
+    </div>
+    <div class="footer-column">
+      <h4>Contacts</h4>
+      <p>Nairobi, Kenya</p>
+      <p>greencarbonplants@gmail.com</p>
+      <p>+254 113105392</p>
+    </div>
+  </div>
+  <div class="footer-social">
+    <a href="#">Facebook</a>
+    <a href="#">Instagram</a>
+    <a href="#">Twitter</a>
+    <a href="#">LinkedIn</a>
+  </div>
+  <div class="footer-copy">© 2026 GREENCARBON PLANTS. All rights reserved.</div>
+</footer>
+
+<!-- WhatsApp floating action button -->
+<a class="whatsapp-fab" href="https://wa.me/254711111111" target="_blank" rel="noopener"
+   aria-label="Chat with us on WhatsApp" title="Chat with us on WhatsApp">
+  <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true" focusable="false">
+    <path fill="currentColor" d="M16.004 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.257.59 4.46 1.71 6.4L3.2 28.8l6.57-1.72a12.76 12.76 0 0 0 6.234 1.588h.005c7.06 0 12.8-5.74 12.8-12.8 0-3.42-1.332-6.635-3.75-9.052A12.72 12.72 0 0 0 16.004 3.2zm0 2.133c2.848 0 5.524 1.11 7.537 3.124a10.58 10.58 0 0 1 3.126 7.53c0 5.884-4.786 10.667-10.668 10.667h-.004a10.62 10.62 0 0 1-5.41-1.48l-.388-.23-3.898 1.02 1.04-3.8-.253-.4a10.6 10.6 0 0 1-1.625-5.667c.002-5.883 4.786-10.667 10.668-10.667zm-4.24 4.6c-.2 0-.525.075-.8.375-.276.3-1.05 1.026-1.05 2.5 0 1.475 1.075 2.9 1.225 3.1.15.2 2.115 3.23 5.125 4.53.714.308 1.27.492 1.704.63.716.228 1.368.196 1.883.118.574-.086 1.767-.722 2.016-1.42.25-.7.25-1.3.175-1.424-.075-.126-.275-.2-.575-.35-.3-.15-1.767-.872-2.04-.972-.274-.1-.474-.15-.674.15-.2.3-.774.97-.95 1.17-.174.2-.35.226-.65.076-.3-.15-1.264-.466-2.408-1.486-.89-.794-1.49-1.774-1.666-2.074-.174-.3-.02-.462.13-.612.136-.135.3-.35.45-.526.15-.174.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.674-1.626-.924-2.226-.243-.585-.49-.505-.674-.514-.174-.008-.374-.01-.574-.01z"/>
+  </svg>
+</a>
+<style>
+  .whatsapp-fab{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    background:#25D366;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 16px rgba(0,0,0,.25);
+    z-index:1000;
+    text-decoration:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .whatsapp-fab:hover{ transform:scale(1.06); box-shadow:0 6px 22px rgba(0,0,0,.32); }
+  .whatsapp-fab:focus-visible{ outline:3px solid rgba(37,211,102,.5); outline-offset:3px; }
+  @media (max-width:600px){
+    .whatsapp-fab{ width:52px; height:52px; right:16px; bottom:16px; }
+  }
+</style>
+
+<script>
+  (function () {
+    const toggle = document.getElementById("nav-toggle");
+    const links  = document.getElementById("nav-links");
+    if (!toggle || !links) return;
+    toggle.addEventListener("click", () => {
+      const open = links.classList.toggle("open");
+      toggle.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    links.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => {
+        links.classList.remove("open");
+        toggle.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  })();
+
+  /* ── NAV SEARCH TOGGLE ────────────────────────────────── */
+  (function () {
+    const wrap  = document.getElementById("nav-search");
+    const btn   = document.getElementById("nav-search-toggle");
+    const input = document.getElementById("nav-search-input");
+    const links = document.getElementById("nav-links");
+    if (!wrap || !btn) return;
+    function close() {
+      wrap.classList.remove("open");
+      btn.setAttribute("aria-expanded", "false");
+    }
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const open = wrap.classList.toggle("open");
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) {
+        if (links) links.classList.remove("open");
+        setTimeout(() => input && input.focus(), 80);
+      }
+    });
+    document.addEventListener("click", e => {
+      if (wrap.classList.contains("open") && !wrap.contains(e.target)) close();
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && wrap.classList.contains("open")) { close(); btn.focus(); }
+    });
+  })();
+
+  function updateBadge() {
+    const cart  = JSON.parse(localStorage.getItem("cart")) || [];
+    const total = cart.reduce((s, i) => s + i.quantity, 0);
+    const badge = document.getElementById("nav-cart-count");
+    badge.textContent   = total;
+    badge.style.display = total > 0 ? "flex" : "none";
+  }
+  updateBadge();
+  window.addEventListener("storage", updateBadge);
+</script>
+
+</body>
+</html>
